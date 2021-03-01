@@ -53,10 +53,16 @@ public class FrontControllerServlet extends HttpServlet {
      * 利用 ServiceLoader 技术（Java SPI）
      */
     private void initHandleMethods() {
+        // 基于Java SPI机制 提前缓存Controller Map
         for (Controller controller : ServiceLoader.load(Controller.class)) {
+            // @Path("/hello")
+            // public class HelloWorldController implements PageController {
             Class<?> controllerClass = controller.getClass();
+            // 获取Controller类上的Path注解
             Path pathFromClass = controllerClass.getAnnotation(Path.class);
+            // /hello
             String requestPath = pathFromClass.value();
+            // 获取类上的Method(public)
             Method[] publicMethods = controllerClass.getMethods();
             // 处理方法支持的 HTTP 方法集合
             for (Method method : publicMethods) {
@@ -76,7 +82,7 @@ public class FrontControllerServlet extends HttpServlet {
      * 获取处理方法中标注的 HTTP方法集合
      *
      * @param method 处理方法
-     * @return
+     * @return HTTP方法集合
      */
     private Set<String> findSupportedHttpMethods(Method method) {
         Set<String> supportedHttpMethods = new LinkedHashSet<>();

@@ -43,6 +43,8 @@ public class DatabaseUserRepository implements UserRepository {
 
     @Override
     public boolean save(User user) {
+        executeUpdate(INSERT_USER_DML_SQL, user);
+
         return false;
     }
 
@@ -102,6 +104,45 @@ public class DatabaseUserRepository implements UserRepository {
     }
 
     /**
+     * 执行更新操作
+     *
+     * @param sql sql语句
+     * @return <code>true</code> / <code>false</code>
+     */
+    protected boolean executeUpdate(String sql, Object... args) {
+
+        // 获取Connection对象
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            for (int i = 0; i < args.length; i++) {
+                Object arg = args[i];
+                // 参数类型对应的 Class对象
+                Class argType = arg.getClass();
+                // Integer.class -> int.class
+                Class primitiveType = wrapperToPrimitive(argType);
+
+                if (primitiveType == null) {
+                    primitiveType = argType;
+                }
+
+                String methodName = preparedStatementMethodMappings.get(argType);
+
+                Method method = PreparedStatement.class.getMethod(methodName, primitiveType);
+                method.invoke(preparedStatement, i + 1, args);
+            }
+
+            int i = preparedStatement.executeUpdate();
+            if (i == 1) {
+                return true;
+            }
+        } catch (Throwable e) {
+
+        }
+        return false;
+    }
+
+    /**
      * @param sql
      * @param function
      * @param <T>
@@ -116,6 +157,7 @@ public class DatabaseUserRepository implements UserRepository {
                 Object arg = args[i];
                 Class argType = arg.getClass();
 
+                // Integer.class -> int.class
                 Class wrapperType = wrapperToPrimitive(argType);
 
                 if (wrapperType == null) {
