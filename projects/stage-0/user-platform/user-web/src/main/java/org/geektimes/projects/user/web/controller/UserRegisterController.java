@@ -21,7 +21,7 @@ import java.util.ServiceLoader;
 @Path("/register")
 public class UserRegisterController implements PageController {
 
-    private  UserService userService;
+    private UserService userService;
 
     /**
      * 使用SPI机制注入UserService实现类
@@ -64,7 +64,7 @@ public class UserRegisterController implements PageController {
 
         boolean register = userService.register(user);
         if (register) {
-            return "registerSuccess";
+            return "registerSuccess.jsp";
         }
         throw new RuntimeException("注册失败，请联系管理员");
     }

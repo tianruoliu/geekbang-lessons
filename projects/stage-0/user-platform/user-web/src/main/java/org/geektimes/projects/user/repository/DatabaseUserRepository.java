@@ -43,9 +43,8 @@ public class DatabaseUserRepository implements UserRepository {
 
     @Override
     public boolean save(User user) {
-        executeUpdate(INSERT_USER_DML_SQL, user);
+        return executeUpdate(INSERT_USER_DML_SQL, user.getName(), user.getPassword(), user.getEmail(), user.getPhoneNumber());
 
-        return false;
     }
 
     @Override
@@ -112,8 +111,9 @@ public class DatabaseUserRepository implements UserRepository {
     protected boolean executeUpdate(String sql, Object... args) {
 
         // 获取Connection对象
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        Connection connection = getConnection();
+        try (
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             for (int i = 0; i < args.length; i++) {
                 Object arg = args[i];
@@ -128,8 +128,8 @@ public class DatabaseUserRepository implements UserRepository {
 
                 String methodName = preparedStatementMethodMappings.get(argType);
 
-                Method method = PreparedStatement.class.getMethod(methodName, primitiveType);
-                method.invoke(preparedStatement, i + 1, args);
+                Method method = PreparedStatement.class.getMethod(methodName, int.class, primitiveType);
+                method.invoke(preparedStatement, i + 1, arg);
             }
 
             int i = preparedStatement.executeUpdate();
@@ -137,7 +137,7 @@ public class DatabaseUserRepository implements UserRepository {
                 return true;
             }
         } catch (Throwable e) {
-
+            e.printStackTrace();
         }
         return false;
     }
@@ -166,8 +166,8 @@ public class DatabaseUserRepository implements UserRepository {
 
                 // Boolean -> boolean
                 String methodName = preparedStatementMethodMappings.get(argType);
-                Method method = PreparedStatement.class.getMethod(methodName, wrapperType);
-                method.invoke(preparedStatement, i + 1, args);
+                Method method = PreparedStatement.class.getMethod(methodName, int.class, wrapperType);
+                method.invoke(preparedStatement, i + 1, arg);
             }
             ResultSet resultSet = preparedStatement.executeQuery();
             // 返回一个 POJO List -> ResultSet -> POJO List

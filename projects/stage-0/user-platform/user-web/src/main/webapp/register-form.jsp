@@ -20,13 +20,23 @@
 </head>
 <body>
 	<div class="container">
-		<form class="form-signin">
+		<form class="form-signin" action="/register">
 			<h1 class="h3 mb-3 font-weight-normal">注册</h1>
+
+			<label for="name" class="sr-only">请输入姓名1</label> <input
+            				type="name" id="inputName" class="form-control" name="name"
+            				placeholder="请输入姓名" required autofocus>
+
+            <label for="phoneNumber" class="sr-only">请输入手机号</label> <input
+                                        				type="phoneNumber" id="inputPhoneNumber" class="form-control" name="phoneNumber"
+                                        				placeholder="请输入手机号" required autofocus>
+
 			<label for="inputEmail" class="sr-only">请输入电子邮件</label> <input
-				type="email" id="inputEmail" class="form-control"
-				placeholder="请输入电子邮件" required autofocus> <label
+ype="email" id="inputEmail" class="form-control" name="email"
+				placeholder="请输入电子邮件" required autofocus>
+			<label
 				for="inputPassword" class="sr-only">Password</label> <input
-				type="password" id="inputPassword" class="form-control"
+				type="password" id="inputPassword" class="form-control" name="password"
 				placeholder="请输入密码" required>
 
 			<button class="btn btn-lg btn-primary btn-block" type="submit">Sign

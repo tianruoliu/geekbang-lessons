@@ -1,8 +1,13 @@
 package org.geektimes.projects.user.service;
 
 import org.geektimes.projects.user.domain.User;
+import org.geektimes.projects.user.repository.DatabaseUserRepository;
 import org.geektimes.projects.user.repository.UserRepository;
+import org.geektimes.projects.user.sql.DBConnectionManager;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -11,23 +16,18 @@ import java.util.ServiceLoader;
  */
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public UserServiceImpl() {
-        ServiceLoader<UserRepository> userServiceServiceLoader = ServiceLoader.load(UserRepository.class);
-
-        Iterator<UserRepository> iterator = userServiceServiceLoader.iterator();
+        DBConnectionManager connectionManager = new DBConnectionManager();
+        String databaseURL = "jdbc:derby:/db/user-platform;create=true";
         try {
-            while (iterator.hasNext()) {
-                UserRepository userRepository = iterator.next();
-                if (null != userRepository) {
-                    this.userRepository = userRepository;
-                    break;
-                }
-            }
-        } catch (Throwable t) {
-
+            Connection connection = DriverManager.getConnection(databaseURL);
+            connectionManager.setConnection(connection);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        userRepository = new DatabaseUserRepository(connectionManager);
     }
 
     /**
