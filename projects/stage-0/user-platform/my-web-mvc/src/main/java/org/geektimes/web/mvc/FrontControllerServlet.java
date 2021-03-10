@@ -4,19 +4,17 @@ import org.apache.commons.lang.StringUtils;
 import org.geektimes.web.mvc.controller.Controller;
 import org.geektimes.web.mvc.controller.PageController;
 import org.geektimes.web.mvc.controller.RestController;
-import org.geektimes.web.mvc.header.CacheControlHeaderWriter;
-import org.geektimes.web.mvc.header.annotation.CacheControl;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import java.io.IOException;
@@ -28,6 +26,8 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.substringAfter;
 
 public class FrontControllerServlet extends HttpServlet {
+
+    private ServletContext servletContext;
 
     /**
      * 请求路径和 Controller 的映射关系缓存
@@ -45,37 +45,90 @@ public class FrontControllerServlet extends HttpServlet {
      * @param servletConfig
      */
     public void init(ServletConfig servletConfig) {
+        this.servletContext = servletConfig.getServletContext();
         initHandleMethods();
     }
+
 
     /**
      * 读取所有的 RestController 的注解元信息 @Path
      * 利用 ServiceLoader 技术（Java SPI）
      */
     private void initHandleMethods() {
-        // 基于Java SPI机制 提前缓存Controller Map
-        for (Controller controller : ServiceLoader.load(Controller.class)) {
-            // @Path("/hello")
-            // public class HelloWorldController implements PageController {
-            Class<?> controllerClass = controller.getClass();
-            // 获取Controller类上的Path注解
-            Path pathFromClass = controllerClass.getAnnotation(Path.class);
-            // /hello
-            String requestPath = pathFromClass.value();
-            // 获取类上的Method(public)
-            Method[] publicMethods = controllerClass.getMethods();
-            // 处理方法支持的 HTTP 方法集合
-            for (Method method : publicMethods) {
-                Set<String> supportedHttpMethods = findSupportedHttpMethods(method);
-                Path pathFromMethod = method.getAnnotation(Path.class);
-                if (pathFromMethod != null) {
-                    requestPath += pathFromMethod.value();
-                }
-                handleMethodInfoMapping.put(requestPath,
-                        new HandlerMethodInfo(requestPath, method, supportedHttpMethods));
+//        Context envContext = initEnvContext();
+
+        Map<String, Object> componentsMap = (Map<String, Object>) servletContext.getAttribute("componentsMap");
+        componentsMap.values().forEach(component -> {
+            if (component instanceof Controller) {
+                doInitHandleMethods((Controller) component);
             }
-            controllersMapping.put(requestPath, controller);
+        });
+
+        // 基于Java SPI机制 提前缓存Controller Map
+//        for (Controller controller : ServiceLoader.load(Controller.class)) {
+//            try {
+//                controller = (Controller) envContext.lookup("bean/UserRegisterController");
+//            } catch (NamingException e) {
+//
+//            }
+//
+//        }
+    }
+
+    private static final String COMPONENT_ENV_CONTEXT_NAME = "java:comp/env";
+
+    /**
+     *
+     */
+    private Context initEnvContext() throws RuntimeException {
+
+        Context context = null;
+        try {
+            context = new InitialContext();
+            return (Context) context.lookup(COMPONENT_ENV_CONTEXT_NAME);
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
+        } finally {
+            close(context);
         }
+    }
+
+    /**
+     * 关闭
+     */
+    private static void close(Context context) throws RuntimeException {
+        if (context != null) {
+            try {
+                context.close();
+            } catch (NamingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+
+    private void doInitHandleMethods(Controller controller) {
+        // @Path("/hello")
+        // public class HelloWorldController implements PageController {
+        Class<?> controllerClass = controller.getClass();
+        // 获取Controller类上的Path注解
+        Path pathFromClass = controllerClass.getAnnotation(Path.class);
+        // /hello
+        String requestPath = pathFromClass.value();
+        // 获取类上的Method(public)
+        Method[] publicMethods = controllerClass.getMethods();
+        // 处理方法支持的 HTTP 方法集合
+        for (Method method : publicMethods) {
+            Set<String> supportedHttpMethods = findSupportedHttpMethods(method);
+            Path pathFromMethod = method.getAnnotation(Path.class);
+            if (pathFromMethod != null) {
+                requestPath += pathFromMethod.value();
+            }
+            handleMethodInfoMapping.put(requestPath,
+                    new HandlerMethodInfo(requestPath, method, supportedHttpMethods));
+        }
+        controllersMapping.put(requestPath, controller);
+
     }
 
     /**

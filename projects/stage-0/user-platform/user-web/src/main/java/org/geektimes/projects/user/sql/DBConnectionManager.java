@@ -1,7 +1,9 @@
 package org.geektimes.projects.user.sql;
 
+import org.geektimes.projects.user.context.ComponentContext;
 import org.geektimes.projects.user.domain.User;
 
+import javax.sql.DataSource;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -9,29 +11,50 @@ import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+/**
+ * JNDI组件
+ *
+ * @author ajin
+ */
 public class DBConnectionManager {
 
-    private Connection connection;
+    private final Logger logger = Logger.getLogger(DBConnectionManager.class.getName());
 
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-    }
+//    private Connection connection;
+
+//    public void setConnection(Connection connection) {
+//        this.connection = connection;
+//    }
 
     public Connection getConnection() {
-        return this.connection;
+        ComponentContext componentContext = ComponentContext.getInstance();
+        DataSource dataSource = componentContext.getComponent("jdbc/UserPlatformDB");
+
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "con not get Connection caused by " + e.getMessage());
+        }
+
+        if (connection != null) {
+            logger.log(Level.INFO,"成功获取JNDI数据库连接");
+        }
+        return connection;
     }
 
-    public void releaseConnection() {
-        if (this.connection != null) {
-            try {
-                this.connection.close();
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getCause());
-            }
-        }
-    }
+//    public void releaseConnection() {
+//        if (this.connection != null) {
+//            try {
+//                this.connection.close();
+//            } catch (SQLException e) {
+//                throw new RuntimeException(e.getCause());
+//            }
+//        }
+//    }
 
     public static final String DROP_USERS_TABLE_DDL_SQL = "DROP TABLE users";
 

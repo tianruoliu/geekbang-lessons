@@ -1,17 +1,16 @@
 package org.geektimes.projects.user.web.controller;
 
+import org.geektimes.projects.user.context.ComponentContext;
 import org.geektimes.projects.user.domain.User;
 import org.geektimes.projects.user.service.UserService;
 import org.geektimes.projects.user.service.UserServiceImpl;
 import org.geektimes.web.mvc.controller.PageController;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import java.sql.Driver;
-import java.util.Iterator;
-import java.util.ServiceLoader;
 
 /**
  * 用户注册逻辑处理{@link PageController}
@@ -19,29 +18,11 @@ import java.util.ServiceLoader;
  * @author ajin
  */
 @Path("/register")
+//@CommonController
 public class UserRegisterController implements PageController {
 
-    private UserService userService;
-
-    /**
-     * 使用SPI机制注入UserService实现类
-     */
-    public UserRegisterController() {
-        ServiceLoader<UserService> userServiceServiceLoader = ServiceLoader.load(UserService.class);
-
-        Iterator<UserService> iterator = userServiceServiceLoader.iterator();
-        try {
-            while (iterator.hasNext()) {
-                UserService userService = iterator.next();
-                if (null != userService) {
-                    this.userService = userService;
-                    break;
-                }
-            }
-        } catch (Throwable t) {
-
-        }
-    }
+    @Resource(name = "bean/UserService")
+    private UserServiceImpl userService;
 
 
     /**
@@ -67,5 +48,12 @@ public class UserRegisterController implements PageController {
             return "registerSuccess.jsp";
         }
         throw new RuntimeException("注册失败，请联系管理员");
+    }
+
+    @Override
+    public String toString() {
+        return "UserRegisterController{" +
+                "userService=" + userService +
+                '}';
     }
 }

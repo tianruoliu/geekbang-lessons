@@ -1,22 +1,42 @@
 package org.geektimes.projects.user.domain;
 
+import org.geektimes.projects.user.validator.bean.validation.PhoneNumber;
+import org.hibernate.validator.constraints.Length;
+
+import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.Objects;
+
+import static javax.persistence.GenerationType.AUTO;
 
 /**
  * 用户领域对象
  *
  * @since 1.0
  */
+@Entity
+@Table(name = "users")
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = AUTO)
+    @Min(value = 1, message = "id必须是大于0的整数")
     private Long id;
 
+    @Column
     private String name;
 
+    @Column
+    @Length(min = 6, max = 32)
     private String password;
 
+    @Column
     private String email;
 
+    @Column
+//    @Length(max = 11, min = 11, message = "手机号必须是11位")
+    @PhoneNumber
     private String phoneNumber;
 
     public Long getId() {
