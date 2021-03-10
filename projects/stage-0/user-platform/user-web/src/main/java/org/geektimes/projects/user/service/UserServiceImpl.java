@@ -1,5 +1,6 @@
 package org.geektimes.projects.user.service;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.geektimes.projects.user.domain.User;
 import org.geektimes.projects.user.repository.DatabaseUserRepository;
 import org.geektimes.projects.user.repository.UserRepository;
@@ -9,8 +10,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.geektimes.projects.user.web.controller.UserRegisterController.ERROR_MESSAGE_HOLDER;
 
 /**
  * @author ajin
@@ -35,13 +41,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean register(User user) {
 
-        validator.validate(user);
+        Set<ConstraintViolation<User>> constraintViolations = validator.validate(user);
+
+        if (!CollectionUtils.isEmpty(constraintViolations)) {
+            String constraintViolationMessage = constraintViolations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(","));
+
+            ERROR_MESSAGE_HOLDER.set(constraintViolationMessage);
+            return false;
+        }
 
         // before process
         EntityTransaction transaction = entityManager.getTransaction();
         transaction.begin();
 
-        TypedQuery<User> query = entityManager.createQuery("from User",User.class);
+        TypedQuery<User> query = entityManager.createQuery("from User", User.class);
         List<User> userList = query.getResultList();
         System.out.println(userList);
 

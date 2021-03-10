@@ -1,8 +1,6 @@
 package org.geektimes.projects.user.web.controller;
 
-import org.geektimes.projects.user.context.ComponentContext;
 import org.geektimes.projects.user.domain.User;
-import org.geektimes.projects.user.service.UserService;
 import org.geektimes.projects.user.service.UserServiceImpl;
 import org.geektimes.web.mvc.controller.PageController;
 
@@ -24,6 +22,8 @@ public class UserRegisterController implements PageController {
     @Resource(name = "bean/UserService")
     private UserServiceImpl userService;
 
+
+    public static final ThreadLocal<String> ERROR_MESSAGE_HOLDER = ThreadLocal.withInitial(() -> "");
 
     /**
      * 1. 保存用户注册信息
@@ -47,7 +47,9 @@ public class UserRegisterController implements PageController {
         if (register) {
             return "registerSuccess.jsp";
         }
-        throw new RuntimeException("注册失败，请联系管理员");
+        request.setAttribute("errorInfo", "注册失败:" + ERROR_MESSAGE_HOLDER.get());
+        return "error.jsp";
+//        throw new RuntimeException("注册失败，请联系管理员");
     }
 
     @Override
