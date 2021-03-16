@@ -47,7 +47,11 @@ public class UserRegisterController implements PageController {
         if (register) {
             return "registerSuccess.jsp";
         }
-        request.setAttribute("errorInfo", "注册失败:" + ERROR_MESSAGE_HOLDER.get());
+        try {
+            request.setAttribute("errorInfo", "注册失败:" + ERROR_MESSAGE_HOLDER.get());
+        } finally {
+            ERROR_MESSAGE_HOLDER.remove();
+        }
         return "error.jsp";
 //        throw new RuntimeException("注册失败，请联系管理员");
     }

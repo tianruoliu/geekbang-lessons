@@ -1,6 +1,6 @@
 package org.geektimes.projects.user.orm.jpa;
 
-import org.geektimes.projects.user.context.ComponentContext;
+import org.geektimes.context.ComponentContext;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

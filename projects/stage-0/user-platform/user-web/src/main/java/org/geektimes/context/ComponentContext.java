@@ -1,4 +1,4 @@
-package org.geektimes.projects.user.context;
+package org.geektimes.context;
 
 import org.geektimes.function.ThrowableAction;
 import org.geektimes.function.ThrowableFunction;
