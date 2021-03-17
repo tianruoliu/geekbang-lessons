@@ -3,19 +3,20 @@ package org.geektimes.projects.user.management;
 import org.geektimes.projects.user.domain.User;
 
 import javax.management.*;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import javax.servlet.*;
+import javax.servlet.http.HttpServlet;
 import java.lang.management.ManagementFactory;
 
-public class MBeanInitializer implements ServletContextListener {
+public class MBeanInitializer extends HttpServlet {
 
     @Override
-    public void contextInitialized(ServletContextEvent sce) {
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
         MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
 
         ObjectName objectName = null;
         try {
-            objectName = new ObjectName("org.geektimes.projects.user.management:type=User");
+            objectName = new ObjectName("jolokia:type=User");
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
         }
@@ -39,12 +40,9 @@ public class MBeanInitializer implements ServletContextListener {
             }
             System.out.println(user);
         }
-    }
-
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
 
     }
+
 
     private static Object createUserMBean(User user) {
         return new UserManager(user);

@@ -8,11 +8,8 @@
     <!-- 请确保这个 Listener 放置在首位 -->
     <listener>
         <listener-class>org.geektimes.projects.user.web.listener.ComponentContextInitializerListener</listener-class>
+    </listener>
 
-    </listener>
-    <listener>
-        <listener-class>org.geektimes.projects.user.management.MBeanInitializer</listener-class>
-    </listener>
 
     <servlet>
         <servlet-name>default</servlet-name>
@@ -60,6 +57,18 @@
         <servlet-name>jolokia-agent</servlet-name>
         <url-pattern>/jolokia/*</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>userMBeanServlet</servlet-name>
+        <servlet-class>org.geektimes.projects.user.management.MBeanInitializer</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>userMBeanServlet</servlet-name>
+        <url-pattern>/userMBean/*</url-pattern>
+    </servlet-mapping>
+
 
     <filter>
         <filter-name>CharsetEncodingFilter</filter-name>
