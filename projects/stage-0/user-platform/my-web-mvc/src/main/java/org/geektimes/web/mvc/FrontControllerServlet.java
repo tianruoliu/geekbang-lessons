@@ -1,6 +1,7 @@
 package org.geektimes.web.mvc;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.microprofile.config.Config;
 import org.geektimes.web.mvc.controller.Controller;
 import org.geektimes.web.mvc.controller.PageController;
 import org.geektimes.web.mvc.controller.RestController;
@@ -20,12 +21,24 @@ import javax.ws.rs.Path;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.substringAfter;
 
+/**
+ * 前端控制 Servlet
+ *
+ * @author ajin
+ */
 public class FrontControllerServlet extends HttpServlet {
+
+    private static final long serialVersionUID = -8170845450363621092L;
+
+    private static final String COMPONENT_ENV_CONTEXT_NAME = "java:comp/env";
 
     private ServletContext servletContext;
 
@@ -44,48 +57,47 @@ public class FrontControllerServlet extends HttpServlet {
      *
      * @param servletConfig
      */
+    @Override
     public void init(ServletConfig servletConfig) {
         this.servletContext = servletConfig.getServletContext();
         initHandleMethods();
     }
-
 
     /**
      * 读取所有的 RestController 的注解元信息 @Path
      * 利用 ServiceLoader 技术（Java SPI）
      */
     private void initHandleMethods() {
-//        Context envContext = initEnvContext();
+        //        Context envContext = initEnvContext();
 
-        Map<String, Object> componentsMap = (Map<String, Object>) servletContext.getAttribute("componentsMap");
+        Map<String, Object> componentsMap = (Map<String, Object>)servletContext.getAttribute("componentsMap");
         componentsMap.values().forEach(component -> {
             if (component instanceof Controller) {
-                doInitHandleMethods((Controller) component);
+                doInitHandleMethods((Controller)component);
             }
         });
 
         // 基于Java SPI机制 提前缓存Controller Map
-//        for (Controller controller : ServiceLoader.load(Controller.class)) {
-//            try {
-//                controller = (Controller) envContext.lookup("bean/UserRegisterController");
-//            } catch (NamingException e) {
-//
-//            }
-//
-//        }
+        //        for (Controller controller : ServiceLoader.load(Controller.class)) {
+        //            try {
+        //                controller = (Controller) envContext.lookup("bean/UserRegisterController");
+        //            } catch (NamingException e) {
+        //
+        //            }
+        //
+        //        }
     }
-
-    private static final String COMPONENT_ENV_CONTEXT_NAME = "java:comp/env";
 
     /**
      *
      */
+    @Deprecated
     private Context initEnvContext() throws RuntimeException {
 
         Context context = null;
         try {
             context = new InitialContext();
-            return (Context) context.lookup(COMPONENT_ENV_CONTEXT_NAME);
+            return (Context)context.lookup(COMPONENT_ENV_CONTEXT_NAME);
         } catch (NamingException e) {
             throw new RuntimeException(e);
         } finally {
@@ -106,7 +118,6 @@ public class FrontControllerServlet extends HttpServlet {
         }
     }
 
-
     private void doInitHandleMethods(Controller controller) {
         // @Path("/hello")
         // public class HelloWorldController implements PageController {
@@ -120,12 +131,11 @@ public class FrontControllerServlet extends HttpServlet {
         // 处理方法支持的 HTTP 方法集合
         for (Method method : publicMethods) {
             Set<String> supportedHttpMethods = findSupportedHttpMethods(method);
-            Path pathFromMethod = method.getAnnotation(Path.class);
+            Path        pathFromMethod       = method.getAnnotation(Path.class);
             if (pathFromMethod != null) {
                 requestPath += pathFromMethod.value();
             }
-            handleMethodInfoMapping.put(requestPath,
-                    new HandlerMethodInfo(requestPath, method, supportedHttpMethods));
+            handleMethodInfoMapping.put(requestPath, new HandlerMethodInfo(requestPath, method, supportedHttpMethods));
         }
         controllersMapping.put(requestPath, controller);
 
@@ -147,11 +157,16 @@ public class FrontControllerServlet extends HttpServlet {
         }
 
         if (supportedHttpMethods.isEmpty()) {
-            supportedHttpMethods.addAll(asList(HttpMethod.GET, HttpMethod.POST,
-                    HttpMethod.PUT, HttpMethod.DELETE, HttpMethod.HEAD, HttpMethod.OPTIONS));
+            supportedHttpMethods.addAll(
+                asList(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE, HttpMethod.HEAD,
+                    HttpMethod.OPTIONS));
         }
 
         return supportedHttpMethods;
+    }
+
+    private Config getConfig() {
+        return (Config)servletContext.getAttribute("microProfileConfig");
     }
 
     /**
@@ -163,19 +178,20 @@ public class FrontControllerServlet extends HttpServlet {
      * @throws IOException
      */
     @Override
-    public void service(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 建立映射关系
         // requestURI = /a/hello/world
         String requestURI = request.getRequestURI();
         // contextPath  = /a or "/" or ""
         String servletContextPath = request.getContextPath();
-        String prefixPath = servletContextPath;
+        String prefixPath         = servletContextPath;
         // 映射路径（子路径）
-        String requestMappingPath = substringAfter(requestURI,
-                StringUtils.replace(prefixPath, "//", "/"));
+        String requestMappingPath = substringAfter(requestURI, StringUtils.replace(prefixPath, "//", "/"));
         // 映射到 Controller
         Controller controller = controllersMapping.get(requestMappingPath);
+
+        // 获取Config对象
+        Config config = getConfig();
 
         if (controller != null) {
 
@@ -194,7 +210,7 @@ public class FrontControllerServlet extends HttpServlet {
 
                     if (controller instanceof PageController) {
                         PageController pageController = PageController.class.cast(controller);
-                        String viewPath = pageController.execute(request, response);
+                        String         viewPath       = pageController.execute(request, response);
                         // 页面请求 forward
                         // request -> RequestDispatcher forward
                         // RequestDispatcher requestDispatcher = request.getRequestDispatcher(viewPath);
@@ -214,7 +230,7 @@ public class FrontControllerServlet extends HttpServlet {
                 }
             } catch (Throwable throwable) {
                 if (throwable.getCause() instanceof IOException) {
-                    throw (IOException) throwable.getCause();
+                    throw (IOException)throwable.getCause();
                 } else {
                     throw new ServletException(throwable.getCause());
                 }
@@ -222,15 +238,15 @@ public class FrontControllerServlet extends HttpServlet {
         }
     }
 
-//    private void beforeInvoke(Method handleMethod, HttpServletRequest request, HttpServletResponse response) {
-//
-//        CacheControl cacheControl = handleMethod.getAnnotation(CacheControl.class);
-//
-//        Map<String, List<String>> headers = new LinkedHashMap<>();
-//
-//        if (cacheControl != null) {
-//            CacheControlHeaderWriter writer = new CacheControlHeaderWriter();
-//            writer.write(headers, cacheControl.value());
-//        }
-//    }
+    //    private void beforeInvoke(Method handleMethod, HttpServletRequest request, HttpServletResponse response) {
+    //
+    //        CacheControl cacheControl = handleMethod.getAnnotation(CacheControl.class);
+    //
+    //        Map<String, List<String>> headers = new LinkedHashMap<>();
+    //
+    //        if (cacheControl != null) {
+    //            CacheControlHeaderWriter writer = new CacheControlHeaderWriter();
+    //            writer.write(headers, cacheControl.value());
+    //        }
+    //    }
 }

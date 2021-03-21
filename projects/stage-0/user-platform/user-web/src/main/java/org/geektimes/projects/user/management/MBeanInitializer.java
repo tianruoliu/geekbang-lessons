@@ -7,15 +7,12 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import java.lang.management.ManagementFactory;
 
-public class MBeanInitializer
-        extends HttpServlet
-        /* implements ServletContextListener*/ {
+public class MBeanInitializer extends HttpServlet
+    /* implements ServletContextListener*/ {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -54,22 +51,21 @@ public class MBeanInitializer
         }
     }
 
-
     private static Object createUserMBean(User user) {
         return new UserManager(user);
     }
 
-//    @Override
-//    public void contextInitialized(ServletContextEvent sce) {
-//        try {
-//            registerUserMBean();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    @Override
-//    public void contextDestroyed(ServletContextEvent sce) {
-//
-//    }
+    //    @Override
+    //    public void contextInitialized(ServletContextEvent sce) {
+    //        try {
+    //            registerUserMBean();
+    //        } catch (Exception e) {
+    //            e.printStackTrace();
+    //        }
+    //    }
+    //
+    //    @Override
+    //    public void contextDestroyed(ServletContextEvent sce) {
+    //
+    //    }
 }

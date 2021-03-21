@@ -8,6 +8,8 @@ import org.geektimes.configuration.microprofile.configsource.ConfigSources;
 import org.geektimes.configuration.microprofile.converter.Converters;
 
 /**
+ * {@link ConfigBuilder} 默认实现
+ *
  * @author ajin
  */
 

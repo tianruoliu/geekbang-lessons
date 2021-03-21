@@ -20,11 +20,13 @@ public abstract class MapBasedConfigSource implements ConfigSource {
 
     private final Map<String, String> source;
 
+
     public MapBasedConfigSource(String name, int ordinal) {
         this.name = name;
         this.ordinal = ordinal;
         this.source = getProperties();
     }
+
 
     /**
      * 设置成final，不让子类魔改

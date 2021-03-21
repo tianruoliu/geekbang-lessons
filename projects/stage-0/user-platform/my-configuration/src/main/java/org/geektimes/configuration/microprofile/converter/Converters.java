@@ -54,7 +54,7 @@ public class Converters implements Iterable<Converter> {
         addConverter(converter, priority, convertedType);
     }
 
-    private Class<?> resolveConvertedType(Converter converter) {
+    public Class<?> resolveConvertedType(Converter converter) {
         assertConverter(converter);
         Class<?> convertedType  = null;
         Class<?> converterClass = converter.getClass();

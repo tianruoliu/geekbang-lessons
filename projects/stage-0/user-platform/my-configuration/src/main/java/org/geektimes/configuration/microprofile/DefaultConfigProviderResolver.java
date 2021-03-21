@@ -66,7 +66,7 @@ public class DefaultConfigProviderResolver extends ConfigProviderResolver {
 
     @Override
     public ConfigBuilder getBuilder() {
-        return null;
+        return newConfigBuilder(null);
     }
 
     @Override
