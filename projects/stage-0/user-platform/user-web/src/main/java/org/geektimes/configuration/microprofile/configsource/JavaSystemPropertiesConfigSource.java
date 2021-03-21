@@ -1,42 +1,25 @@
 package org.geektimes.configuration.microprofile.configsource;
 
-import org.eclipse.microprofile.config.spi.ConfigSource;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Java系统属性配置源
+ * <p>
+ * Java 系统属性最好通过本地变量保存，使用 Map 保存，尽可能运行期不去调整  ，-Dapplication.name=user-web
  *
  * @author ajin
  */
 
-public class JavaSystemPropertiesConfigSource implements ConfigSource {
-
-    /**
-     * Java 系统属性最好通过本地变量保存，使用 Map 保存，尽可能运行期不去调整
-     * -Dapplication.name=user-web
-     */
-    private final Map<String, String> properties;
+public class JavaSystemPropertiesConfigSource extends MapBasedConfigSource {
 
     public JavaSystemPropertiesConfigSource() {
-        Map systemProperties = System.getProperties();
-        this.properties = new HashMap<>(systemProperties);
+        super("Java System Properties", 400);
     }
 
     @Override
-    public Set<String> getPropertyNames() {
-        return properties.keySet();
+    protected void prepareConfigData(Map configData) throws Throwable {
+        configData.putAll(System.getProperties());
     }
 
-    @Override
-    public String getValue(String propertyName) {
-        return properties.get(propertyName);
-    }
-
-    @Override
-    public String getName() {
-        return "Java System Properties";
-    }
 }

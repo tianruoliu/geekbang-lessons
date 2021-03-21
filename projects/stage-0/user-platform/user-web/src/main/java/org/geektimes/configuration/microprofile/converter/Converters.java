@@ -5,10 +5,7 @@ import org.eclipse.microprofile.config.spi.Converter;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 import static java.util.ServiceLoader.load;
 
@@ -66,6 +63,17 @@ public class Converters implements Iterable<Converter> {
             if (convertedType != null) {
                 break;
             }
+
+            Type superType = converterClass.getGenericSuperclass();
+            if (superType instanceof ParameterizedType) {
+                convertedType = resolveConvertedType(superType);
+            }
+
+            if (convertedType != null) {
+                break;
+            }
+            // recursively
+            converterClass = converterClass.getSuperclass();
         }
         return convertedType;
     }
@@ -73,7 +81,7 @@ public class Converters implements Iterable<Converter> {
     private Class<?> resolveConvertedType(Class<?> converterClass) {
         Class<?> convertedType = null;
 
-        // converterClass.getGenericInterfaces():获取该类实现的接口Type
+        // converterClass.getGenericInterfaces():获取该类实现的接口数组
 
         // Type : Type is the common superinterface for all types in the Java
         //  programming language. These include raw types, parameterized types,
@@ -106,7 +114,7 @@ public class Converters implements Iterable<Converter> {
         return convertedType;
     }
 
-    private void addConverter(Converter converter, int priority, Class<?> convertedType) {
+    public void addConverter(Converter converter, int priority, Class<?> convertedType) {
         PriorityQueue<PrioritizedConverter> priorityQueue = typedConverters.computeIfAbsent(convertedType,
             t -> new PriorityQueue<>());
 
@@ -129,9 +137,34 @@ public class Converters implements Iterable<Converter> {
         }
     }
 
+    public void addConverters(Converter... converters) {
+        addConverters(Arrays.asList(converters));
+    }
+
+    public List<Converter> getConverters(Class<?> convertedType) {
+
+        List<Converter> converterList = new LinkedList<>();
+
+        PriorityQueue<PrioritizedConverter> priorityQueue = typedConverters.get(convertedType);
+        if (null == priorityQueue || priorityQueue.isEmpty()) {
+            return Collections.emptyList();
+        }
+        for (PrioritizedConverter prioritizedConverter : priorityQueue) {
+            converterList.add(prioritizedConverter.getConverter());
+        }
+
+        return converterList;
+    }
+
     @Override
     public Iterator<Converter> iterator() {
-        return null;
+        List<Converter> allConverters = new LinkedList<>();
+        for (PriorityQueue<PrioritizedConverter> priorityQueue : typedConverters.values()) {
+            for (PrioritizedConverter prioritizedConverter : priorityQueue) {
+                allConverters.add(prioritizedConverter.getConverter());
+            }
+        }
+        return allConverters.iterator();
     }
 
 }
