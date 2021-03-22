@@ -2,6 +2,7 @@ package org.geektimes.web.mvc;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.geektimes.web.mvc.controller.Controller;
 import org.geektimes.web.mvc.controller.PageController;
 import org.geektimes.web.mvc.controller.RestController;
@@ -28,6 +29,7 @@ import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.substringAfter;
+import static org.geektimes.configuration.microprofile.configsource.servlet.ServletContextConfigInitializer.CONFIG_HOLDER;
 
 /**
  * 前端控制 Servlet
@@ -52,6 +54,8 @@ public class FrontControllerServlet extends HttpServlet {
      */
     private Map<String, HandlerMethodInfo> handleMethodInfoMapping = new HashMap<>();
 
+    private Config config;
+
     /**
      * 初始化 Servlet
      *
@@ -60,6 +64,7 @@ public class FrontControllerServlet extends HttpServlet {
     @Override
     public void init(ServletConfig servletConfig) {
         this.servletContext = servletConfig.getServletContext();
+        this.config = CONFIG_HOLDER.get();
         initHandleMethods();
     }
 
@@ -191,7 +196,20 @@ public class FrontControllerServlet extends HttpServlet {
         Controller controller = controllersMapping.get(requestMappingPath);
 
         // 获取Config对象
+
+        // 第一种方式，基于ServletContext（属性）
         Config config = getConfig();
+
+        // 第二种方式，显示API调用
+        ConfigProviderResolver configProviderResolver = ConfigProviderResolver.instance();
+        config = configProviderResolver.getConfig();
+
+        // 第三种方式，基于ThreadLocal
+        // try {
+        //     config = CONFIG_HOLDER.get();
+        // } finally {
+        //     CONFIG_HOLDER.remove();
+        // }
 
         if (controller != null) {
 
