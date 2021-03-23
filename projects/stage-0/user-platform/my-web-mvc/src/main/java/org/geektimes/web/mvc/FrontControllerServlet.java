@@ -64,7 +64,12 @@ public class FrontControllerServlet extends HttpServlet {
     @Override
     public void init(ServletConfig servletConfig) {
         this.servletContext = servletConfig.getServletContext();
+
         this.config = CONFIG_HOLDER.get();
+
+        ConfigProviderResolver configProviderResolver = ConfigProviderResolver.instance();
+        this.config = configProviderResolver.getConfig();
+
         initHandleMethods();
     }
 
@@ -198,15 +203,15 @@ public class FrontControllerServlet extends HttpServlet {
         // 获取Config对象
 
         // 第一种方式，基于ServletContext（属性）
-        Config config = getConfig();
+        this.config = getConfig();
 
         // 第二种方式，显示API调用
         ConfigProviderResolver configProviderResolver = ConfigProviderResolver.instance();
-        config = configProviderResolver.getConfig();
+        this.config = configProviderResolver.getConfig();
 
         // 第三种方式，基于ThreadLocal
         // try {
-        //     config = CONFIG_HOLDER.get();
+        //     this.config = CONFIG_HOLDER.get();
         // } finally {
         //     CONFIG_HOLDER.remove();
         // }
