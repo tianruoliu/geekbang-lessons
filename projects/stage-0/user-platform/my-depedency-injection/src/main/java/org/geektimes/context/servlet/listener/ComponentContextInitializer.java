@@ -1,6 +1,4 @@
-package org.geektimes.context.servlet;
-
-import org.geektimes.context.ComponentContextInitializerListener;
+package org.geektimes.context.servlet.listener;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;

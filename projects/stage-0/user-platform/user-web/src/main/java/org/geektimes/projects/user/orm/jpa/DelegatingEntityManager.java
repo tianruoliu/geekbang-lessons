@@ -1,6 +1,6 @@
 package org.geektimes.projects.user.orm.jpa;
 
-import org.geektimes.context.ComponentContext;
+import org.geektimes.context.core.ClassicComponentContext;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -75,12 +75,12 @@ public class DelegatingEntityManager implements EntityManager {
         }
 
         // 增加JNDI引用处理
-        ComponentContext componentContext = ComponentContext.getInstance();
+        ClassicComponentContext classicComponentContext = ClassicComponentContext.getInstance();
         for (String propertyName : properties.stringPropertyNames()) {
             String propertyValue = properties.getProperty(propertyName);
             if (propertyValue.startsWith("@")) {
                 String componentName = propertyValue.substring(1);
-                Object component = componentContext.getComponent(componentName);
+                Object component = classicComponentContext.getComponent(componentName);
                 properties.put(propertyName, component);
             }
         }

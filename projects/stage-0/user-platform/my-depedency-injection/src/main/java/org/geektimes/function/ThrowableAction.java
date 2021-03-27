@@ -1,4 +1,4 @@
-package org.geektimes.context.function;
+package org.geektimes.function;
 
 /**
  * A function interface for action with {@link Throwable}

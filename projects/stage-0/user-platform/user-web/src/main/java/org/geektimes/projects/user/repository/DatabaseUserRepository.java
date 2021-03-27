@@ -1,7 +1,7 @@
 package org.geektimes.projects.user.repository;
 
-import org.geektimes.context.function.ThrowableFunction;
-import org.geektimes.context.ComponentContext;
+import org.geektimes.function.ThrowableFunction;
+import org.geektimes.context.core.ClassicComponentContext;
 import org.geektimes.projects.user.domain.User;
 import org.geektimes.projects.user.sql.DBConnectionManager;
 
@@ -36,7 +36,7 @@ public class DatabaseUserRepository implements UserRepository {
 
     public DatabaseUserRepository() {
         // 依赖查找获取DBConnectionManager
-        this.dbConnectionManager = ComponentContext.getInstance().getComponent("bean/DBConnectionManager");
+        this.dbConnectionManager = ClassicComponentContext.getInstance().getComponent("bean/DBConnectionManager");
     }
 
 //    public DatabaseUserRepository(DBConnectionManager dbConnectionManager) {

@@ -1,6 +1,6 @@
 package org.geektimes.projects.user.sql;
 
-import org.geektimes.context.ComponentContext;
+import org.geektimes.context.core.ClassicComponentContext;
 import org.geektimes.projects.user.domain.User;
 
 import javax.sql.DataSource;
@@ -30,8 +30,8 @@ public class DBConnectionManager {
 //    }
 
     public Connection getConnection() {
-        ComponentContext componentContext = ComponentContext.getInstance();
-        DataSource dataSource = componentContext.getComponent("jdbc/UserPlatformDB");
+        ClassicComponentContext classicComponentContext = ClassicComponentContext.getInstance();
+        DataSource              dataSource              = classicComponentContext.getComponent("jdbc/UserPlatformDB");
 
         Connection connection = null;
         try {
