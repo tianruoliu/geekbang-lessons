@@ -1,4 +1,4 @@
-package org.geektimes.configuration.microprofile.converter;
+package org.geektimes.configuration.microprofile.config.converter;
 
 /**
  * @author ajin

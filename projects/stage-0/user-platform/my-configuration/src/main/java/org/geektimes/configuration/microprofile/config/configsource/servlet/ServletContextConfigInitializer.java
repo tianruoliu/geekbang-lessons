@@ -1,4 +1,4 @@
-package org.geektimes.configuration.microprofile.configsource.servlet;
+package org.geektimes.configuration.microprofile.config.configsource.servlet;
 
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigBuilder;
@@ -25,7 +25,6 @@ public class ServletContextConfigInitializer implements ServletContextListener {
         return servletContext;
     }
 
-    public static final ThreadLocal<Config> CONFIG_HOLDER = ThreadLocal.withInitial(() -> null);
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -58,8 +57,7 @@ public class ServletContextConfigInitializer implements ServletContextListener {
 
         String applicationName = config.getValue("application.name", String.class);
         System.out.println(applicationName);
-        servletContext.setAttribute(MICROPROFILE_CONFIG, config);
-        CONFIG_HOLDER.set(config);
+
     }
 
     @Override

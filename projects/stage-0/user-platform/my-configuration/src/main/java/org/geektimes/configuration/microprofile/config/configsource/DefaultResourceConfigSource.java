@@ -1,4 +1,4 @@
-package org.geektimes.configuration.microprofile.configsource;
+package org.geektimes.configuration.microprofile.config.configsource;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -15,7 +15,7 @@ public class DefaultResourceConfigSource extends MapBasedConfigSource {
     private static final String configFileLocation = "META-INF/microprofile-config.properties";
 
     private static final Logger logger = Logger.getLogger(
-        "org.geektimes.configuration.microprofile.configsource.DefaultResourceConfigSource");
+        "org.geektimes.configuration.microprofile.config.configsource.DefaultResourceConfigSource");
 
     public DefaultResourceConfigSource() {
         super("Default Config File", 100);

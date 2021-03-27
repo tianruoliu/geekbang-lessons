@@ -1,4 +1,4 @@
-package org.geektimes.configuration.microprofile.configsource.servlet;
+package org.geektimes.configuration.microprofile.config.configsource.servlet;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;

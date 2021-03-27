@@ -1,7 +1,6 @@
-package org.geektimes.configuration.microprofile.configsource;
+package org.geektimes.configuration.microprofile.config.configsource;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Java系统属性配置源

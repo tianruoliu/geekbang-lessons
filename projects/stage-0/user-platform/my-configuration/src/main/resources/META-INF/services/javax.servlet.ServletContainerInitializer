@@ -1,1 +1,1 @@
-org.geektimes.configuration.microprofile.configsource.servlet.ServletConfigInitializer
+org.geektimes.configuration.microprofile.config.configsource.servlet.ServletConfigInitializer

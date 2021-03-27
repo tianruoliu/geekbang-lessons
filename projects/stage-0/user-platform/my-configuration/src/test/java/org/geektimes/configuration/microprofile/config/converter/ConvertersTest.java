@@ -1,6 +1,5 @@
 package org.geektimes.configuration.microprofile.config.converter;
 
-import org.geektimes.configuration.microprofile.converter.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

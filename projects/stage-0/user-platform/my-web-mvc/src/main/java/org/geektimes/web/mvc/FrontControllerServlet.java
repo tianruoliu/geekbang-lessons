@@ -1,8 +1,6 @@
 package org.geektimes.web.mvc;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.microprofile.config.Config;
-import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.geektimes.web.mvc.controller.Controller;
 import org.geektimes.web.mvc.controller.PageController;
 import org.geektimes.web.mvc.controller.RestController;
@@ -29,7 +27,6 @@ import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.substringAfter;
-import static org.geektimes.configuration.microprofile.configsource.servlet.ServletContextConfigInitializer.CONFIG_HOLDER;
 
 /**
  * 前端控制 Servlet
@@ -54,7 +51,6 @@ public class FrontControllerServlet extends HttpServlet {
      */
     private Map<String, HandlerMethodInfo> handleMethodInfoMapping = new HashMap<>();
 
-    private Config config;
 
     /**
      * 初始化 Servlet
@@ -65,10 +61,6 @@ public class FrontControllerServlet extends HttpServlet {
     public void init(ServletConfig servletConfig) {
         this.servletContext = servletConfig.getServletContext();
 
-        this.config = CONFIG_HOLDER.get();
-
-        ConfigProviderResolver configProviderResolver = ConfigProviderResolver.instance();
-        this.config = configProviderResolver.getConfig();
 
         initHandleMethods();
     }
@@ -175,9 +167,6 @@ public class FrontControllerServlet extends HttpServlet {
         return supportedHttpMethods;
     }
 
-    private Config getConfig() {
-        return (Config)servletContext.getAttribute("microProfileConfig");
-    }
 
     /**
      * SCWCD
@@ -200,14 +189,7 @@ public class FrontControllerServlet extends HttpServlet {
         // 映射到 Controller
         Controller controller = controllersMapping.get(requestMappingPath);
 
-        // 获取Config对象
 
-        // 第一种方式，基于ServletContext（属性）
-        this.config = getConfig();
-
-        // 第二种方式，显示API调用
-        ConfigProviderResolver configProviderResolver = ConfigProviderResolver.instance();
-        this.config = configProviderResolver.getConfig();
 
         // 第三种方式，基于ThreadLocal
         // try {

@@ -40,11 +40,5 @@
             <!--<scope>provided</scope>-->
         <!--</dependency>-->
 
-        <dependency>
-            <groupId>org.geekbang.projects</groupId>
-            <artifactId>my-configuration</artifactId>
-            <version>${revision}</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 </project>

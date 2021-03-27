@@ -1,4 +1,4 @@
-package org.geektimes.configuration.microprofile;
+package org.geektimes.configuration.microprofile.config;
 
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.spi.ConfigBuilder;

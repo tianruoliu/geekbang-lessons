@@ -1,11 +1,11 @@
-package org.geektimes.configuration.microprofile;
+package org.geektimes.configuration.microprofile.config;
 
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigValue;
 import org.eclipse.microprofile.config.spi.ConfigSource;
 import org.eclipse.microprofile.config.spi.Converter;
-import org.geektimes.configuration.microprofile.configsource.ConfigSources;
-import org.geektimes.configuration.microprofile.converter.Converters;
+import org.geektimes.configuration.microprofile.config.configsource.ConfigSources;
+import org.geektimes.configuration.microprofile.config.converter.Converters;
 
 import java.util.LinkedHashSet;
 import java.util.List;
