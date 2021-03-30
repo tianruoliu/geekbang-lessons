@@ -5,6 +5,7 @@ package org.geektimes.configuration.microprofile.demo;
  */
 
 public class GetApplicationNameTest {
+
     public static void main(String[] args) {
 
     }
