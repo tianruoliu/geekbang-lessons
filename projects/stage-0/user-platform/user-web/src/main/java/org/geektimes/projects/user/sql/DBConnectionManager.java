@@ -3,6 +3,8 @@ package org.geektimes.projects.user.sql;
 import org.geektimes.context.core.ClassicComponentContext;
 import org.geektimes.projects.user.domain.User;
 
+import javax.annotation.Resource;
+import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -28,6 +30,17 @@ public class DBConnectionManager {
 //    public void setConnection(Connection connection) {
 //        this.connection = connection;
 //    }
+
+    @Resource(name = "jdbc/UserPlatformDB")
+    private DataSource dataSource;
+
+    @Resource(name = "bean/EntityManager")
+    private EntityManager entityManager;
+
+    public EntityManager getEntityManager() {
+        logger.info("当前 EntityManager 实现类：" + entityManager.getClass().getName());
+        return entityManager;
+    }
 
     public Connection getConnection() {
         ClassicComponentContext classicComponentContext = ClassicComponentContext.getInstance();
