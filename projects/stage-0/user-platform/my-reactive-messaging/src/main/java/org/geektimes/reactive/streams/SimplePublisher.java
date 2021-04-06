@@ -16,6 +16,26 @@ public class SimplePublisher<T> implements Publisher<T> {
 
     @Override
     public void subscribe(Subscriber<? super T> subscriber) {
+        SubscriptionAdapter subscriptionAdapter = new SubscriptionAdapter(subscriber);
+        subscriber.onSubscribe(subscriptionAdapter);
 
+        subscribers.add(subscriber);
     }
+
+    public void publish(T data) {
+        subscribers.forEach(subscriber -> {
+            subscriber.onNext(data);
+        });
+    }
+
+    public static void main(String[] args) {
+        SimplePublisher publisher = new SimplePublisher();
+
+        publisher.subscribe(new BusinessSubscriber(1));
+
+        for (int i = 0; i < 5; i++) {
+            publisher.publish(i);
+        }
+    }
+
 }

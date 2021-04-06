@@ -52,9 +52,8 @@ public class HttpGetInvocation implements Invocation {
             connection = (HttpURLConnection)url.openConnection();
             connection.setRequestMethod(HttpMethod.GET);
             setRequestHeaders(connection);
-            int statusCode = connection.getResponseCode();
-
-            DefaultResponse response = new DefaultResponse();
+            int             statusCode = connection.getResponseCode();
+            DefaultResponse response   = new DefaultResponse();
             response.setConnection(connection);
             response.setStatus(statusCode);
             return response;

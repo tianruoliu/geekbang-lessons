@@ -39,8 +39,7 @@ public class TestingListener implements ServletContextListener {
 
     private void testPropertyFromServletContext(ServletContext servletContext) {
         String propertyName = "application.name";
-        logger.info("ServletContext Property[" + propertyName + "] : "
-                + servletContext.getInitParameter(propertyName));
+        logger.info("ServletContext Property[" + propertyName + "] : " + servletContext.getInitParameter(propertyName));
     }
 
     // private void testPropertyFromJNDI(ClassicComponentContext context) {
@@ -63,7 +62,7 @@ public class TestingListener implements ServletContextListener {
 
     private void testJms(ConnectionFactory connectionFactory) {
         ThrowableAction.execute(() -> {
-//            testMessageProducer(connectionFactory);
+            //            testMessageProducer(connectionFactory);
             testMessageConsumer(connectionFactory);
         });
     }
@@ -84,7 +83,7 @@ public class TestingListener implements ServletContextListener {
         producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
 
         // Create a messages
-        String text = "Hello world! From: " + Thread.currentThread().getName() + " : " + this.hashCode();
+        String      text    = "Hello world! From: " + Thread.currentThread().getName() + " : " + this.hashCode();
         TextMessage message = session.createTextMessage(text);
 
         // Tell the producer to send the message
@@ -113,7 +112,7 @@ public class TestingListener implements ServletContextListener {
         MessageConsumer consumer = session.createConsumer(destination);
 
         consumer.setMessageListener(m -> {
-            TextMessage tm = (TextMessage) m;
+            TextMessage tm = (TextMessage)m;
             try {
                 System.out.printf("[Thread : %s] Received : %s\n", Thread.currentThread().getName(), tm.getText());
             } catch (JMSException e) {
@@ -125,7 +124,6 @@ public class TestingListener implements ServletContextListener {
         // session.close();
         // connection.close();
     }
-
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {

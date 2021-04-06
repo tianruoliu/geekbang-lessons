@@ -12,8 +12,8 @@ class SubscriptionAdapter implements Subscription {
 
     private final DecoratingSubscriber<?> subscriber;
 
-    public SubscriptionAdapter(DecoratingSubscriber<?> subscriber) {
-        this.subscriber = subscriber;
+    public SubscriptionAdapter(Subscriber<?> subscriber) {
+        this.subscriber = new DecoratingSubscriber<>(subscriber);
     }
 
     @Override
