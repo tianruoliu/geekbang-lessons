@@ -29,6 +29,13 @@
 
         <dependency>
             <groupId>org.geekbang.projects</groupId>
+            <artifactId>my-cache</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.geekbang.projects</groupId>
             <artifactId>my-depedency-injection</artifactId>
             <version>${revision}</version>
         </dependency>
