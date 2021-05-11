@@ -26,8 +26,7 @@ import org.springframework.context.annotation.ImportResource;
  * Date : 2021-05-06
  */
 @EnableMyBatis(dataSource = "dataSource", configLocation = "classpath*:META-INF/mybatis/mybatis-config.xml", mapperLocations = {
-    "classpath*:sample/config/mappers/**/*.xml"}, environment = "development", typeAliasesPackage = "org.geektimes.projects.user.mybatis.alias",
- transactionFactory = "springManagedTransactionFactory",databaseIdProvider="databaseIdProvider",objectFactory = "defaultObjectFactory")
+    "classpath*:sample/config/mappers/**/*.xml"}, environment = "development", typeAliasesPackage = "org.geektimes.projects.user.mybatis.alias", transactionFactory = "springManagedTransactionFactory", databaseIdProvider = "databaseIdProvider", objectFactory = "defaultObjectFactory", configuration ="mybatisConfiguration")
 @ImportResource(locations = "classpath*:sample/spring-context.xml") // SqlSessionFactoryBean
 public class EnableMyBatisExample {
 }

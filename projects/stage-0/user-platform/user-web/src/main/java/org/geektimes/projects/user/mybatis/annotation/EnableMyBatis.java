@@ -50,4 +50,14 @@ public @interface EnableMyBatis {
 
     String objectFactory();
 
+
+    //<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    //   <property name="dataSource" ref="dataSource" />
+    //   <property name="configuration">
+    //     <bean class="org.apache.ibatis.session.Configuration">
+    //       <property name="mapUnderscoreToCamelCase" value="true"/>
+    //     </bean>
+    //   </property>
+    // </bean>
+   String configuration();
 }

@@ -52,6 +52,7 @@ public class MyBatisBeanDefinitionRegistrar implements ImportBeanDefinitionRegis
         beanDefinitionBuilder.addPropertyReference("databaseIdProvider", (String)attributes.get("databaseIdProvider"));
         beanDefinitionBuilder.addPropertyReference("objectFactory", (String)attributes.get("objectFactory"));
         beanDefinitionBuilder.addPropertyReference("cache", (String)attributes.get("cache"));
+        beanDefinitionBuilder.addPropertyReference("configuration", (String)attributes.get("configuration"));
 
 
         BeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
