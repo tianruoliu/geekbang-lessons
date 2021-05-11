@@ -39,6 +39,17 @@ public class User {
     @PhoneNumber
     private String phoneNumber;
 
+    public User() {
+    }
+
+    public User(long id, String name, String password, String email,String phoneNumber) {
+        this.id=id;
+        this.name=name;
+        this.password=password;
+        this.email=email;
+        this.phoneNumber=phoneNumber;
+    }
+
     public Long getId() {
         return id;
     }
