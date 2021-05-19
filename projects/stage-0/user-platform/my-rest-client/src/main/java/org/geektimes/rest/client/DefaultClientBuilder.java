@@ -7,6 +7,9 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Configuration;
 import java.security.KeyStore;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * {@link ClientBuilder}默认实现
@@ -42,6 +45,26 @@ public class DefaultClientBuilder extends ClientBuilder {
     @Override
     public ClientBuilder hostnameVerifier(HostnameVerifier verifier) {
         throw  newUnsupportedSSLException();
+    }
+
+    @Override
+    public ClientBuilder executorService(ExecutorService executorService) {
+        return null;
+    }
+
+    @Override
+    public ClientBuilder scheduledExecutorService(ScheduledExecutorService scheduledExecutorService) {
+        return null;
+    }
+
+    @Override
+    public ClientBuilder connectTimeout(long timeout, TimeUnit unit) {
+        return null;
+    }
+
+    @Override
+    public ClientBuilder readTimeout(long timeout, TimeUnit unit) {
+        return null;
     }
 
     @Override

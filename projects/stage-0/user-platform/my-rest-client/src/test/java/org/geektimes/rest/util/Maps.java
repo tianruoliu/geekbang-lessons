@@ -21,7 +21,7 @@ import java.util.Map;
 
 /**
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @since
+ * @since 1.0.0
  */
 public interface Maps {
 

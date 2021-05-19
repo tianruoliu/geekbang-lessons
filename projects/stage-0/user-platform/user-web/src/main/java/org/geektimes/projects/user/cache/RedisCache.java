@@ -17,13 +17,19 @@
 package org.geektimes.projects.user.cache;
 
 import org.springframework.cache.Cache;
-import org.springframework.stereotype.Component;
+import org.springframework.core.convert.ConversionFailedException;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.util.ReflectionUtils;
 import redis.clients.jedis.Jedis;
 
 import javax.cache.CacheException;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+
+import static org.geektimes.projects.user.cache.RedisCacheConfig.REDIS_CACHE_CONFIG_THREAD_LOCAL;
 
 /**
  * Redis Cache 实现
@@ -86,11 +92,58 @@ public class RedisCache implements Cache {
         jedis.del(keyBytes);
     }
 
+
+
     @Override
     public void clear() {
         // Redis 是否支持 namespace
         // name:key
         // String 类型的 key :
+        RedisCacheConfig redisCacheConfig = REDIS_CACHE_CONFIG_THREAD_LOCAL.get();
+        ConversionService conversionService =redisCacheConfig.getConversionService();
+        // byte[] pattern = conversionService.convert(createCacheKey("*"), byte[].class);
+
+        // byte[] pattern = conversionService.convert(createCacheKey("*"), byte[].class);
+        // jedis.del( pattern);
+    }
+    // protected String createCacheKey(Object key) {
+    //
+    //     String convertedKey = convertKey(key);
+    //     RedisCacheConfig cacheConfig = REDIS_CACHE_CONFIG_THREAD_LOCAL.get();
+    //
+    //
+    // }
+
+    protected String convertKey(Object key) {
+        RedisCacheConfig redisCacheConfig = REDIS_CACHE_CONFIG_THREAD_LOCAL.get();
+        ConversionService conversionService =redisCacheConfig.getConversionService();
+
+        if (key instanceof String) {
+            return (String) key;
+        }
+
+        TypeDescriptor source = TypeDescriptor.forObject(key);
+
+        if (conversionService.canConvert(source, TypeDescriptor.valueOf(String.class))) {
+            try {
+                return conversionService.convert(key, String.class);
+            } catch (ConversionFailedException e) {
+
+                // may fail if the given key is a collection
+
+                throw e;
+            }
+        }
+
+        Method toString = ReflectionUtils.findMethod(key.getClass(), "toString");
+
+        if (toString != null && !Object.class.equals(toString.getDeclaringClass())) {
+            return key.toString();
+        }
+
+        throw new IllegalStateException(String.format(
+            "Cannot convert cache key %s to String. Please register a suitable Converter via 'RedisCacheConfiguration.configureKeyConverters(...)' or override '%s.toString()'.",
+            source, key.getClass().getSimpleName()));
     }
 
     // 是否可以抽象出一套序列化和反序列化的 API
