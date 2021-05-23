@@ -16,16 +16,23 @@
  */
 package org.geektimes.projects.user.cache;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.util.ReflectionUtils;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 
 import javax.cache.CacheException;
 import java.io.*;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 
@@ -40,6 +47,8 @@ import static org.geektimes.projects.user.cache.RedisCacheConfig.REDIS_CACHE_CON
  */
 public class RedisCache implements Cache {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisCache.class);
+
     private final String name;
 
     private final Jedis jedis;
@@ -50,7 +59,6 @@ public class RedisCache implements Cache {
         this.name = name;
         this.jedis = jedis;
     }
-
 
     @Override
     public String getName() {
@@ -64,7 +72,7 @@ public class RedisCache implements Cache {
 
     @Override
     public ValueWrapper get(Object key) {
-        byte[] keyBytes = serialize(key);
+        byte[] keyBytes   = serialize(key);
         byte[] valueBytes = jedis.get(keyBytes);
         return () -> deserialize(valueBytes);
     }
@@ -81,7 +89,7 @@ public class RedisCache implements Cache {
 
     @Override
     public void put(Object key, Object value) {
-        byte[] keyBytes = serialize(key);
+        byte[] keyBytes   = serialize(key);
         byte[] valueBytes = serialize(value);
         jedis.set(keyBytes, valueBytes);
     }
@@ -92,34 +100,57 @@ public class RedisCache implements Cache {
         jedis.del(keyBytes);
     }
 
+    private static final String CACHE_KEY_PREFIX = "user:platform:cache";
 
+    private static final int SCAN_COUNT = 1000;
+
+    private static final String END_CURSOR = "0";
 
     @Override
     public void clear() {
         // Redis 是否支持 namespace
         // name:key
-        // String 类型的 key :
-        RedisCacheConfig redisCacheConfig = REDIS_CACHE_CONFIG_THREAD_LOCAL.get();
-        ConversionService conversionService =redisCacheConfig.getConversionService();
-        // byte[] pattern = conversionService.convert(createCacheKey("*"), byte[].class);
 
-        // byte[] pattern = conversionService.convert(createCacheKey("*"), byte[].class);
-        // jedis.del( pattern);
+        ScanParams scanParams = new ScanParams();
+        scanParams.count(SCAN_COUNT);
+        scanParams.match(CACHE_KEY_PREFIX);
+
+        String       cursor       = "0";
+        List<String> cacheKeyList = new ArrayList<>();
+
+        LOGGER.debug("准备scan扫描缓存key");
+        while (true) {
+            ScanResult<String> scanResult = jedis.scan(cursor, scanParams);
+            if (END_CURSOR.equals(scanResult.getCursor())) {
+                // 最后一条
+                break;
+            }
+
+            cursor = scanResult.getCursor();
+            cacheKeyList.addAll(scanResult.getResult());
+        }
+        LOGGER.debug("扫描缓存key执行成功");
+
+
+
+        Pipeline pipeline = jedis.pipelined();
+
+        for (String cacheKey : cacheKeyList) {
+            pipeline.del(cacheKey);
+        }
+        pipeline.sync();
+
+        LOGGER.debug("批量清除缓存key执行成功");
+
+
     }
-    // protected String createCacheKey(Object key) {
-    //
-    //     String convertedKey = convertKey(key);
-    //     RedisCacheConfig cacheConfig = REDIS_CACHE_CONFIG_THREAD_LOCAL.get();
-    //
-    //
-    // }
 
     protected String convertKey(Object key) {
-        RedisCacheConfig redisCacheConfig = REDIS_CACHE_CONFIG_THREAD_LOCAL.get();
-        ConversionService conversionService =redisCacheConfig.getConversionService();
+        RedisCacheConfig  redisCacheConfig  = REDIS_CACHE_CONFIG_THREAD_LOCAL.get();
+        ConversionService conversionService = redisCacheConfig.getConversionService();
 
         if (key instanceof String) {
-            return (String) key;
+            return (String)key;
         }
 
         TypeDescriptor source = TypeDescriptor.forObject(key);
@@ -150,8 +181,7 @@ public class RedisCache implements Cache {
     private byte[] serialize(Object value) throws CacheException {
         byte[] bytes = null;
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream)
-        ) {
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream)) {
             // Key -> byte[]
             objectOutputStream.writeObject(value);
             bytes = outputStream.toByteArray();
@@ -167,10 +197,9 @@ public class RedisCache implements Cache {
         }
         T value = null;
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)
-        ) {
+            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
             // byte[] -> Value
-            value = (T) objectInputStream.readObject();
+            value = (T)objectInputStream.readObject();
         } catch (Exception e) {
             throw new CacheException(e);
         }
