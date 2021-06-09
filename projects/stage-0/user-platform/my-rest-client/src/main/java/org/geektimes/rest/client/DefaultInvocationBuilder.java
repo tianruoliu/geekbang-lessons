@@ -3,9 +3,7 @@ package org.geektimes.rest.client;
 import org.apache.commons.lang.StringUtils;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.client.AsyncInvoker;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.*;
 import javax.ws.rs.core.*;
 import java.util.*;
 import java.util.stream.Stream;
@@ -100,6 +98,16 @@ public class DefaultInvocationBuilder implements Invocation.Builder {
     public Invocation.Builder property(String name, Object value) {
         this.properties.put(name, value);
         return this;
+    }
+
+    @Override
+    public CompletionStageRxInvoker rx() {
+        return null;
+    }
+
+    @Override
+    public <T extends RxInvoker> T rx(Class<T> clazz) {
+        return null;
     }
 
     @Override

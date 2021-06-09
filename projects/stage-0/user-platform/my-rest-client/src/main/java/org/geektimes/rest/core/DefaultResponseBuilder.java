@@ -82,6 +82,11 @@ public class DefaultResponseBuilder extends Response.ResponseBuilder {
     }
 
     @Override
+    public Response.ResponseBuilder status(int status, String reasonPhrase) {
+        return null;
+    }
+
+    @Override
     public Response.ResponseBuilder entity(Object entity) {
         this.entity = entity;
         return this;
