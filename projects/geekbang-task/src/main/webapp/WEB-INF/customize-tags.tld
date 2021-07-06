@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd">
+    <description><![CDATA["Shopizer tag libs"]]></description>
+    <display-name>"Customize Tags"</display-name>
+    <tlib-version>2.2</tlib-version>
+    <short-name>sm</short-name>
+    <uri>/customize-tags</uri>
+
+
+
+
+
+    <tag>
+        <name>common-response-headers</name>
+        <tag-class>com.ajin.geekbang.task.CustomizedResponseTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>cacheControl</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <type>java.lang.String</type>
+        </attribute>
+
+        <attribute>
+            <name>pragma</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <type>java.lang.String</type>
+        </attribute>
+
+        <attribute>
+            <name>expires</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
+
+</taglib>
+
+ 
